@@ -12,8 +12,7 @@ import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Hashtable;
 
-import com.tr6.ws.rmv.saam.edona.controller.Controller;
-import com.tr6.ws.rmv.saam.edona.dbmanager.LoaderDB;
+import com.isep.mobility.project.server.dbmanager.LoaderDB;
 
 
 
@@ -34,7 +33,7 @@ public class SQLitemanager implements IObjectStoringManager{
 	private long tempsFin = 0;
 	private ArrayList<Long> tabRetardTotal;
 
-	public SQLitemanager(String jdbcDriver, String dbPath, String user,	String pass) {
+	public SQLitemanager(String jdbcDriver, String dbPath, String user,	String pass){
 		
 		JDBCDRIVER = jdbcDriver;
 		DBPATH = dbPath; 
@@ -229,7 +228,7 @@ public class SQLitemanager implements IObjectStoringManager{
 		  statement.executeUpdate(requete);
 			
 	}
-	
+	/*
 	public void ShowVisualization() throws SQLException {
 	ResultSet rs =  statement.executeQuery("SELECT * FROM enreg_view");
 	ModelEnreg me = null;
@@ -251,30 +250,10 @@ public class SQLitemanager implements IObjectStoringManager{
 	  ArrayList<Long> al =  computederiveeTemps();
 		 for (int i=0;i<al.size();i++)
 	}
-
-	public ArrayList<Long> computederiveeTemps() throws SQLException {
-		Long NumberOfHourProvider = (long) 0;
-		Long LastValOfHour = null;
-		ArrayList<Long> deriveeArray = new ArrayList<Long>();
-		ResultSet rs = statement.executeQuery("select HeureDonnee from enregNAV where MessageType = \"Msg100ms\" OR MessageType = \"Msg1s\" ");
-		
-		while(rs.next())
-		{
-			if(LastValOfHour == null)
-			{
-				NumberOfHourProvider++;
-				LastValOfHour = rs.getLong(1);
-			}
-			else
-			{
-				NumberOfHourProvider++;
-				deriveeArray.add(((rs.getLong(1)-100)-LastValOfHour)/NumberOfHourProvider);
-				LastValOfHour = rs.getLong(1);
-			}
-			
+*/
 	
 			
-		}
+		
 		//Iterator<Long> it = deriveeArray.iterator();
 		//while(it.hasNext())
 		//{
@@ -282,9 +261,7 @@ public class SQLitemanager implements IObjectStoringManager{
 		//	System.out.println("derivee : "+ it.next());
 			
 		//}
-		return deriveeArray;
-	}
-	
+
 
 	
 	
