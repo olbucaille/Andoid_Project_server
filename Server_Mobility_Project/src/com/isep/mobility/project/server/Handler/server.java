@@ -1,65 +1,75 @@
 package com.isep.mobility.project.server.Handler;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.PrintStream;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
 
 public class server extends Thread{
 
-		    private  ServerSocket serverSocket;
-	    private  Socket clientSocket;
-	    private  PrintStream sortie;
-	    private  BufferedReader entree;
-	    private static String message;
-	    
-	    
-	    
+	private ServerSocket s;
+	final int port = 4242;
 
-	    public  void Boucle() {
-	    	
-	    	 try {
-	    	serverSocket = new ServerSocket(4242); 
-	    	  clientSocket = serverSocket.accept();
-	    	entree = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-			sortie = new PrintStream(clientSocket.getOutputStream());
-	    	 } catch (IOException e) {
-		            System.out.println("Could not listen on port: 4242");
-		        }
-	        this.start();
+	public  void Boucle() {
 
-	        System.out.println("Server started. Listening to the port 4444");
-
-	             
-
-	    }
-	    
-	    // run de test écoute sur le 4242 et ecris ce qu'il reçoit
-	    public void run()
-	    {
-	    	 while (true) {
-		            try {
-		           //     clientSocket = serverSocket.accept();   //accept the client connection
-		               
-		                //recevoir
-		                message = entree.readLine();
-		                System.out.println(message);
-		               
-		                //ecrire
-		                sortie.println("bien recu");
-		                
-		                //all close
-		                sortie.close();
-		    			entree.close();
-		                clientSocket.close();
-
-		            } catch (IOException ex) {
-		                System.out.println("Problem in message reading");
-		            }
-		        }
-	    }
 	
+		
+		try {
+			s = new ServerSocket(port);
+			this.start();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		System.out.println("Server started. Listening to the port 4242");
+
+	}
+
+	
+
+	// run de test écoute sur le 4242 et ecris ce qu'il reçoit
+	public void run()
+	{
+		
+
+
+		
+		try {
+
+		Socket soc = s.accept();
+
+		// Un BufferedReader permet de lire par ligne.
+		BufferedReader plec = new BufferedReader(
+				new InputStreamReader(soc.getInputStream())
+				);
+
+		// Un PrintWriter possède toutes les opérations print classiques.
+		// En mode auto-flush, le tampon est vidé (flush) à l'appel de println.
+		PrintWriter pred = new PrintWriter(
+				new BufferedWriter(
+						new OutputStreamWriter(soc.getOutputStream())), 
+						true);
+		
+
+		while (true) {
+			String str = plec.readLine();          // lecture du message
+			if (str.equals("END")) break;
+			System.out.println("ECHO = " + str);   // trace locale
+			pred.println("recu");                     // renvoi d'un écho
+		}
+		plec.close();
+		pred.close();
+		soc.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
 }
+
+
