@@ -4,6 +4,9 @@ package com.isep.mobility.project.server.dbmanager;
 
 
 import java.io.IOException;
+import java.sql.Statement;
+import java.util.List;
+
 import com.isep.mobility.project.server.dbmanager.db.SQLitemanager;
 
 
@@ -21,6 +24,9 @@ public class LoaderDB extends Thread {
 	public final static String DBSYNTHESEENREG = "syntheseenregnav";
 	private SQLitemanager SQLiteM = null;
 		
+
+	
+
 	
 	/**
 	 * insere les données dans une ou plusieurs base de données. 
@@ -32,11 +38,69 @@ public class LoaderDB extends Thread {
 	 * @param synthese
 	 *          de l'enregisterement et surtout statistique associées (pertes, duree...)
 	 */
+	public void InsertDataToDatabase(final String name, final List<Object> listData) {
+		tempsDebut=System.currentTimeMillis();
+		NAMEDB = name;
+		System.out.println(this.getClass().getSimpleName() + ".InsertDataToDatabase()> inserting data into: " + name + " start...");
+
+			// on prépare la barre de progression
+			//ProgressBarMonitor progressUI = new ProgressBarMonitor("Converting data", listData.size()); // FIXME fonctionne trÃ¨s bien mais sale, code Swing dans le kernel
+
+			// --------------------------------------------------------------------
+		
+
+			// on ecrit la phrase de stat
+			//fwriter.write("Resume: " + synthese.NavStatToString() + "\r\n");
+			//FIXME pas d'enreg de synthese implémenté 
+			
+			
+			//ouverture de connexion à la BDD
+			SQLitemanager dt = new SQLitemanager("org.sqlite.JDBC", "jdbc:sqlite:"+"./db/"+NAMEDB, "", "");
+
+			
+			//dt.ConnectDB();
+			//mise à 0 des Tables
+
+			// suite...
+			Statement statement;
+			System.out.println("\nnombre d'enregistrements à insérer : "+listData.size());  
+
+			//préparation de la table
+			dt.dropAllTables();
+			dt.createTablesEnreg();
+			//dt.setScriptFormatText();	
+			waitAMoment();
+
+			System.out.println("début insertion en table");
+
+		
+		
+			//insertion des enregs
+			//dt.insertMyInfosDM(listData);
+			
+			//fermeture de la BDD    
+			dt.shutdown();
+			
+		
+
+		
+		System.out.println(this.getClass().getSimpleName() + ".InsertDataToDatabase()> finish! ");
+		ComputeTime();
+		System.out.println("\n datas inséré");
+	}
 	
 	
 
+		private void ComputeTime()
+		{
+		 tempsFin  = System.currentTimeMillis();
+		float seconds = (tempsFin - tempsDebut) / 1000F;
+		
+		
+		System.out.println("Opération effectuée en: "+ seconds + " secondes.");
 
-		//utilisé en débug
+		}
+		
 		private static void waitAMoment() {
 			System.out.println("Appuyer sur la touche entrer pour continuer");
 			char c;
@@ -57,33 +121,12 @@ public class LoaderDB extends Thread {
 			
 			return NAMEDB;
 		}
+}
 
-
-
-		public boolean setDatabase(String path) {
-		//à updater si besoin de faire tourner sur Fedora
-		if(System.getProperty("os.name").equals("Windows XP"))
-			path = path.replaceAll("\\\\", "/");
-		else
-			path = path.replaceAll("\\\\", "/");
-		
-			NAMEDB = path ;
-		
-			SQLiteM = new SQLitemanager("org.sqlite.JDBC", NAMEDB, "", "");
-			
-			
-			if(SQLiteM.ConnectDB())
-				return true;
-			
-			else return false;
-			
-			
-		}
-		
 		 
 		
 
 
 
 		
-}
+
