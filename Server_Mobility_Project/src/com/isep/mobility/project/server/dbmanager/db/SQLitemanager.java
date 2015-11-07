@@ -11,7 +11,9 @@ import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Hashtable;
+import java.util.List;
 
+import com.isep.mobility.project.server.controller.StringProvider;
 import com.isep.mobility.project.server.dbmanager.LoaderDB;
 
 
@@ -33,10 +35,10 @@ public class SQLitemanager implements IObjectStoringManager{
 	private long tempsFin = 0;
 	private ArrayList<Long> tabRetardTotal;
 
-	public SQLitemanager(String jdbcDriver, String dbPath, String user,	String pass){
+	public SQLitemanager(String jdbcDriver,  String user,	String pass){
 		
 		JDBCDRIVER = jdbcDriver;
-		DBPATH = dbPath; 
+	
 		USER = user; 
 		PASS = pass;
 	}
@@ -55,45 +57,27 @@ public class SQLitemanager implements IObjectStoringManager{
 	    try
 	    {
 	      // create a database connection
-	    	connexion = DriverManager.getConnection("jdbc:sqlite:"+DBPATH);
+	    	connexion = DriverManager.getConnection("jdbc:sqlite:"+StringProvider.DBPATH);
 	       statement = connexion.createStatement();
 	      statement.setQueryTimeout(30);  // set timeout to 30 sec.
 
-	   
+	 
 	     
-	      ResultSet rs = statement.executeQuery("select * from enregnav limit 0,10");
-	    
+	      ResultSet rs = statement.executeQuery("select * from user limit 0,10");
+	      System.out.println("db : connected");
 	    }
 	    catch(SQLException e)
 	    {
 	      // if the error message is "out of memory", 
 	      // it probably means no database file is found
-	  //    System.err.println(e.getMessage());
+	      System.err.println(e.getMessage());
 	      return false;
 	    }
 	    
 	    return true;
 	}
 
-	@Override
-	public void dropAllTables() {
-		try {	
-			if (connexion == null)
-				ConnectDB();
-			
-		
-			statement.executeUpdate("drop table IF EXISTS  "+LoaderDB.DBENREG+" ;");		
-			statement.executeUpdate("drop table IF EXISTS  "+LoaderDB.DBSYNTHESEENREG+" ;");
-			statement.executeUpdate("DROP INDEX IF EXISTS index_enregnav_IdMessage ;");
-			statement.executeUpdate("DROP INDEX IF EXISTS index_enregnav_MessageDate ;");
-			statement.executeUpdate("DROP INDEX IF EXISTS index_enregnav_MessageType ;");
-		
-				
-			} catch (SQLException e) {
-				e.printStackTrace();
-			}
-		
-	}
+
 
 	@Override
 	public void close() {
@@ -123,134 +107,34 @@ public class SQLitemanager implements IObjectStoringManager{
 		}
 		
 	}
+	public void insertMyInfosDM(List<Object> listData) {
+		
+	      String sql = "INSERT INTO User (U_iD,U_name) " +
+	                   "VALUES (\"01\",\"toto\");"; 
+	      Statement stmt;
+		try {
+			stmt = connexion.createStatement();
+			   
+		      stmt.executeUpdate(sql);
+			
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	 
+	}
+
+	@Override
+	public void dropAllTables() {
+		// TODO Auto-generated method stub
+		
+	}
 
 	@Override
 	public void createTablesEnreg() {
-		try {
-			 
-			if (connexion == null)
-				ConnectDB();
-		    
-			statement = connexion.createStatement();
-			statement.executeUpdate("CREATE TABLE IF NOT EXISTS ENREGNAV"
-					+ "	(IdMessage BIGINT,"
-					+ " MessageDate BIGINT,"
-					+ "	MessageType VARCHAR(10),"
-					+ "	EnTete BIGINT,"
-					+ "	MotEtat BIGINT,"
-					+ "	DateDonnee BIGINT,"
-					+ "	HeureDonnee BIGINT,"
-					+ "	ViellissementDonnee BIGINT,"
-					+ "	CapK REAL, "
-					+ "	RoulisRr REAL,"
-					+ "	TanguageTa REAL,"
-					+ "	Latitude REAL,"
-					+ "	Longitude REAL,"
-					+ "	Pilonnement_10ms REAL,"
-					+ "	Pilonnement_1s REAL,"
-					+ "	VitesseVerticale REAL,"
-					+ "	VitesseLoch REAL,"
-					+ "	VitesseNord REAL,"
-					+ "	VitesseOuest REAL,"
-					+ "	EcartTypeLatitude REAL, "
-					+ "	EcartTypeLongitude REAL,"
-					+ "	EcartTypeCapK REAL,"
-					+ "	ErreurCirculairePosition REAL)");
-			
-			statement.executeUpdate("CREATE  TABLE IF NOT EXISTS SYNTHESEENREGNAV "
-					+ "	(statDureeNav BIGINT,"
-					+ "	nbMessageRecu BIGINT,"
-					
-					+ "	statNbrMsg10msNbrLost BIGINT,"
-					+ "	statNbrMsg10msTimeLost BIGINT,"
-				
-					+ "	statNbrMsg100msNbrLost BIGINT,"
-					+ "	statNbrMsg100msTimeLost BIGINT,"
-				
-					+ "	statNbrMsg1sNbrLost BIGINT,"
-					+ "	statNbrMsg1sTimeLost BIGINT"
-					
-					+")");
-		}
-		catch(SQLException e){
-			e.printStackTrace();
-		}
+		// TODO Auto-generated method stub
 		
 	}
-
-	public Long countAllEnreg() throws SQLException {
-		ResultSet rs = statement.executeQuery("SELECT count(*) from enregnav ");
-		return rs.getLong(1);
-	}
-
-	public Long countTimeEnreg() throws SQLException {
-		long nbenreg = 0;
-		ResultSet rs = statement.executeQuery("select MessageDate from enreGNAV where IdMessage = 0 ");
-		long deb = rs.getLong(1);
-		rs = statement.executeQuery("select MessageDate from enreGNAV where IdMessage = "+(nbenreg-1));	
-		long fin = rs.getLong(1);
-		
-		return fin-deb;
-	}
-
-	public void computeDelay() throws SQLException {
-		
-		ResultSet rs = statement.executeQuery("select MessageDate,IdMessage,MessageType from enreGNAV ");
-	
-	}
-
-	public void prepareVisualization(HashMap<Long,Integer> tabRetardNormal, HashMap<Long,Integer> tabMessageManquant) throws SQLException {
-		
-		tabRetardTotal = new ArrayList<Long>();
-		tabRetardTotal.addAll(tabMessageManquant.keySet());
-		tabRetardTotal.addAll(tabRetardNormal.keySet());
-		
-		statement.executeUpdate("DROP VIEW IF EXISTS enreg_view ;");
-		 String requete = "CREATE VIEW  enreg_view AS SELECT * from enreGNAV WHERE enregNAV.IdMessage IN ( ";
-		 if(tabRetardTotal == null)
-			 requete = requete.concat(" ");
-		 else
-		 {
-			
-			 for(int i=0;i<tabRetardTotal.size();i++)
-			 {
-			 		if(i==0)
-			 		requete = requete.concat(""+tabRetardTotal.get(i));
-			 		else
-			 		requete = requete.concat(","+tabRetardTotal.get(i) );
-			 }
-		 }
-		 
-		 //requete = requete.concat(""+tabRetard.get(0) );
-		 	requete = requete.concat(");");
-			//	System.out.println(requete);
-		 
-		  statement.executeUpdate(requete);
-			
-	}
-	/*
-	public void ShowVisualization() throws SQLException {
-	ResultSet rs =  statement.executeQuery("SELECT * FROM enreg_view");
-	ModelEnreg me = null;
-
-	while(rs.next())
-	{
-		int res; 
-		}
-	
-	Hashtable<Integer, Integer> arrayRetard10Msg = DelayComputation.tabSuivitRetard10ms;
-	
-	Enumeration<Integer> itr = arrayRetard10Msg.keys();
-	  while(itr.hasMoreElements())
-	  {
-		  Integer i = itr.nextElement(); 
-	 
-	    }
-	
-	  ArrayList<Long> al =  computederiveeTemps();
-		 for (int i=0;i<al.size();i++)
-	}
-*/
 	
 			
 		

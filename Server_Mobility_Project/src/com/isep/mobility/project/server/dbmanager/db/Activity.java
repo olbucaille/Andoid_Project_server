@@ -2,7 +2,10 @@ package com.isep.mobility.project.server.dbmanager.db;
 
 
 
+import java.sql.SQLException;
 import java.util.ArrayList;
+
+import com.isep.mobility.project.server.controller.Controller;
 
 public class Activity {
 	
@@ -39,7 +42,26 @@ public class Activity {
 				ListeHeartBeat = new ArrayList<HeartBeat>();
 			}
 
-
+			public void AddActivityToDb()
+			{
+				Controller.LDB.connect();
+				
+			      String sql = "INSERT INTO Activity (A_iD,U_iD, Date, Distance) " +
+		                  "VALUES ('"+Id+"','"+IdOwner+"','"+Date+"','"+Distance+" ');"; 
+			      System.out.println(sql);
+			      try {
+					SQLitemanager.statement.executeUpdate(sql);
+				} catch (SQLException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			      
+			    
+				
+			for (HeartBeat elem : ListeHeartBeat) {
+				elem.AddHeartBeatToDb();
+			}
+			}
 
 			public String getId() {
 				return Id;
