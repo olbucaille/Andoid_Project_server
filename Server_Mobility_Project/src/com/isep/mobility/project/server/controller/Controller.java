@@ -40,6 +40,13 @@ public class Controller extends Thread {
 		Activity a = new Activity(Id, IdOwner, Date, Distance, ListeHeartBeat);
 		a.AddActivityToDb();
 	}
+	
+	public static void AddHeartBeatTodb(String IdAct,String Value,String Date)
+	{
+	
+		HeartBeat hb = new HeartBeat(IdAct,Integer.valueOf(Value),Date);
+		hb.AddHeartBeatToDb();
+	}
 
 
 }

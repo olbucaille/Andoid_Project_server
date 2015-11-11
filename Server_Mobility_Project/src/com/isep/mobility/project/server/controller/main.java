@@ -28,16 +28,16 @@ public class main  {
 	{
 		
 		initializeModel();
-		//startserv();
-		HeartBeat h1 = new HeartBeat("85",42,"05");
-
+		startserv();
+		//HeartBeat h1 = new HeartBeat("85",42,"05");
+/*
 		HeartBeat h2 = new HeartBeat("85",85,"06");
 		HeartBeat h3 = new HeartBeat("85",110,"07");
 		ArrayList<HeartBeat> hlist = new ArrayList<HeartBeat>();
 		hlist.add(h1);
 		hlist.add(h2);
 		hlist.add(h3);
-		Controller.AddActivityTodb("85", "12", "42", Float.parseFloat("49"), hlist);
+		Controller.AddActivityTodb("85", "12", "42", Float.parseFloat("49"), hlist);*/
 	
 	}
 	
